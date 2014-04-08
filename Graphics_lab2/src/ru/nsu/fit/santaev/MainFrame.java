@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
 	private int height = 0;
 
 	public double DEFAULT_MOVE_STEP = 0.5f;
-	public double DEFAULT_ZOOM_STEP = 0.1f;
+	public double DEFAULT_ZOOM_STEP = 0.05f;
 	
 	public double MOVE_STEP = DEFAULT_MOVE_STEP;
 	public double ZOOM_STEP = DEFAULT_ZOOM_STEP;
@@ -386,18 +386,12 @@ public class MainFrame extends JFrame {
 			img.getGraphics().setColor(Color.white);
 			img.getGraphics().fillRect(0, 0, img.getWidth(), img.getHeight());//drawRect(0, 0, 100, 100);
 			graph.setColor(Color.RED);
+			
 			drawFirstPart(graph);
-			/*graph.setColor(Color.BLUE);
 			drawSecondPart(graph);
-			graph.setColor(Color.CYAN);
 			drawThirdPart(graph);
-			graph.setColor(Color.magenta);
 			drawFourthPart(graph);
-			graph.setColor(Color.BLACK);
-			drawFivethPart(graph);
-			graph.setColor(Color.green);
-			drawSixthPart(graph);
-			*/
+			
 			graph.drawImage(img, 0, 0, null);
 			drawLines(graph);
 		}
@@ -460,6 +454,62 @@ public class MainFrame extends JFrame {
 			super.paint(g);
 			updateGraphics(g);
 		}
+		public void drawSecondPart(Graphics graph) {
+			double tEnd = 0;
+			double t = 0;
+			double Mx = 0;
+			double My = 0;
+			double dt = 0;
+			double x = 0;
+			double y = 0;
+			double x2 = 0;
+			double y2 = 0;
+			double x3 = 0;
+			double y3 = 0;
+			double delta = (rightTopCoorX - leftBottomCoorX) / (2 * width * width);
+			double xx = 0;
+			int k = 0;
+			if (isDrawColor){
+				graph.setColor(Color.BLACK);
+			}
+			int i = 0;
+			t = Math.PI / 4;
+			if (leftBottomCoorX > -paramC * Math.sqrt(2)){
+				t = Math.PI / 4 + getTFromX(-leftBottomCoorX);
+			}
+			if (rightTopCoorX < 0 && rightTopCoorX > -paramC * Math.sqrt(2)){
+				tEnd = Math.PI / 4 + getTFromX(-rightTopCoorX);
+			}else{
+				tEnd = Double.MAX_VALUE;
+			}
+			if (leftBottomCoorX > 0 || rightTopCoorX < -paramC * Math.sqrt(2)){
+				return;
+			}
+			//log("delta = " + delta + " " + leftBottomCoorX);
+			
+			do {
+				i++;			
+				x = getX(t);
+				y = getY(t);
+				x2 = getX(t + delta);
+				y2 = getY(t + delta);
+				x3 = getX(t + 2 * delta);
+				y3 = getY(t + 2 * delta);
+				drawDot(-x, -y, graph);
+				xx = (int) ((x - (double) leftBottomCoorX)
+						/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width) - (int) ((-1 * (double) leftBottomCoorX)
+								/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width);
+				
+				My = Math.max(Math.abs((x2 - x)/(delta)), Math.abs((x3 - x2)/(delta)));
+				Mx = Math.max(Math.abs((y2 - y)/(delta)), Math.abs((y3 - y2)/(delta)));
+				dt = Math.min(((rightTopCoorX - leftBottomCoorX) 
+						/ (1 * Mx * ( width ))),
+						(rightTopCoorY - leftBottomCoorY)
+								/ (1 * My * (height )));
+				t += dt;
+				delta = dt;
+			} while (xx >= 1 && t < tEnd);
+		}
 		public void drawFirstPart(Graphics graph) {
 			double tEnd = 0;
 			double t = 0;
@@ -472,8 +522,7 @@ public class MainFrame extends JFrame {
 			double y2 = 0;
 			double x3 = 0;
 			double y3 = 0;
-			double delta = 0.001f;
-			double tmp = 0;
+			double delta = (rightTopCoorX - leftBottomCoorX) / (2 * width * width);
 			double xx = 0;
 			int k = 0;
 			if (isDrawColor){
@@ -481,38 +530,177 @@ public class MainFrame extends JFrame {
 			}
 			int i = 0;
 			t = Math.PI / 4;
+			if (rightTopCoorX < paramC * Math.sqrt(2)){
+				t = Math.PI / 4 + getTFromX(rightTopCoorX);
+			}
+			if (leftBottomCoorX > 0 && leftBottomCoorX < paramC * Math.sqrt(2)){
+				tEnd = Math.PI / 4 + getTFromX(leftBottomCoorX);
+			}else{
+				tEnd = Double.MAX_VALUE;
+			}
+			if (rightTopCoorX < 0 || leftBottomCoorX > paramC * Math.sqrt(2)){
+				return;
+			}
+			//log("delta = " + delta + " " + leftBottomCoorX);
+			
 			do {
-				i++;
-				tmp = Math.sqrt(Math.tan(Math.PI + t));
-				x = paramC * Math.sqrt(2) * ((tmp + tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp)); 
-				y = paramC * Math.sqrt(2) * ((tmp - tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp));
-				tmp = Math.sqrt(Math.tan(Math.PI + t + delta));
-				x2 = paramC * Math.sqrt(2) * ((tmp + tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp)); 
-				y2 = paramC * Math.sqrt(2) * ((tmp - tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp));
-				tmp = Math.sqrt(Math.tan(Math.PI + t + 2 * delta));
-				x3 = paramC * Math.sqrt(2) * ((tmp + tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp)); 
-				y3 = paramC * Math.sqrt(2) * ((tmp - tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp));
+				i++;			
+				x = getX(t);
+				y = getY(t);
+				//log("! " + x + ' ' + y);
+				x2 = getX(t + delta);
+				y2 = getY(t + delta);
+				x3 = getX(t + 2 * delta);
+				y3 = getY(t + 2 * delta);
 				drawDot(x, -y, graph);
-				drawDot(x, y, graph);
-				drawDot(-x, y, graph);
-				drawDot(-x, -y, graph);
 				xx = (int) ((x - (double) leftBottomCoorX)
-						/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width);
+						/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width) - (int) ((-1 * (double) leftBottomCoorX)
+								/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width);
 				
 				My = Math.max(Math.abs((x2 - x)/(delta)), Math.abs((x3 - x2)/(delta)));
 				Mx = Math.max(Math.abs((y2 - y)/(delta)), Math.abs((y3 - y2)/(delta)));
-				//log("Mx = " + x2 + " " + x + " " + t);
+				dt = Math.min(((rightTopCoorX - leftBottomCoorX) 
+						/ (1 * Mx * ( width ))),
+						(rightTopCoorY - leftBottomCoorY)
+								/ (1 * My * (height )));
+				//log("!! " + t + " " + x2 + " " + y2 + " " + x3 + " " + delta );
+				t += dt;
+				delta = dt;
+			} while (xx >= 1 && t < tEnd);
+			//log("i = " + i + " " + xx + " " + t + " " + tEnd);
+		}
+		public void drawThirdPart(Graphics graph) {
+			double tEnd = 0;
+			double t = 0;
+			double Mx = 0;
+			double My = 0;
+			double dt = 0;
+			double x = 0;
+			double y = 0;
+			double x2 = 0;
+			double y2 = 0;
+			double x3 = 0;
+			double y3 = 0;
+			double delta = (rightTopCoorX - leftBottomCoorX) / (2 * width * width);
+			double xx = 0;
+			int k = 0;
+			if (isDrawColor){
+				graph.setColor(Color.BLACK);
+			}
+			int i = 0;
+			t = Math.PI / 4;
+			if (rightTopCoorX < paramC * Math.sqrt(2)){
+				t = Math.PI / 4 + getTFromX(rightTopCoorX);
+			}
+			if (leftBottomCoorX > 0 && leftBottomCoorX < paramC * Math.sqrt(2)){
+				tEnd = Math.PI / 4 + getTFromX(leftBottomCoorX);
+			}else{
+				tEnd = Double.MAX_VALUE;
+			}
+			if (rightTopCoorX < 0 || leftBottomCoorX > paramC * Math.sqrt(2)){
+				return;
+			}
+			//log("delta = " + delta + " " + leftBottomCoorX);
+			
+			do {
+				i++;			
+				x = getX(t);
+				y = getY(t);
+				//log("! " + x + ' ' + y);
+				x2 = getX(t + delta);
+				y2 = getY(t + delta);
+				x3 = getX(t + 2 * delta);
+				y3 = getY(t + 2 * delta);
+				drawDot(x, y, graph);
+				xx = (int) ((x - (double) leftBottomCoorX)
+						/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width) - (int) ((-1 * (double) leftBottomCoorX)
+								/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width);
+				
+				My = Math.max(Math.abs((x2 - x)/(delta)), Math.abs((x3 - x2)/(delta)));
+				Mx = Math.max(Math.abs((y2 - y)/(delta)), Math.abs((y3 - y2)/(delta)));
+				dt = Math.min(((rightTopCoorX - leftBottomCoorX) 
+						/ (1 * Mx * ( width ))),
+						(rightTopCoorY - leftBottomCoorY)
+								/ (1 * My * (height )));
+				//log("!! " + t + " " + x2 + " " + y2 + " " + x3 + " " + delta );
+				t += dt;
+				delta = dt;
+			} while (xx >= 1 && t < tEnd);
+			//log("i = " + i + " " + xx + " " + t + " " + tEnd);
+		}
+		public void drawFourthPart(Graphics graph) {
+			double tEnd = 0;
+			double t = 0;
+			double Mx = 0;
+			double My = 0;
+			double dt = 0;
+			double x = 0;
+			double y = 0;
+			double x2 = 0;
+			double y2 = 0;
+			double x3 = 0;
+			double y3 = 0;
+			double delta = (rightTopCoorX - leftBottomCoorX) / (2 * width * width);
+			double xx = 0;
+			int k = 0;
+			if (isDrawColor){
+				graph.setColor(Color.BLACK);
+			}
+			int i = 0;
+			t = Math.PI / 4;
+			if (leftBottomCoorX > -paramC * Math.sqrt(2)){
+				t = Math.PI / 4 + getTFromX(-leftBottomCoorX);
+			}
+			if (rightTopCoorX < 0 && rightTopCoorX > -paramC * Math.sqrt(2)){
+				tEnd = Math.PI / 4 + getTFromX(-rightTopCoorX);
+			}else{
+				tEnd = Double.MAX_VALUE;
+			}
+			if (leftBottomCoorX > 0 || rightTopCoorX < -paramC * Math.sqrt(2)){
+				return;
+			}
+			//log("delta = " + delta + " " + leftBottomCoorX);
+			
+			do {
+				i++;			
+				x = getX(t);
+				y = getY(t);
+				x2 = getX(t + delta);
+				y2 = getY(t + delta);
+				x3 = getX(t + 2 * delta);
+				y3 = getY(t + 2 * delta);
+				drawDot(-x, y, graph);
+				xx = (int) ((x - (double) leftBottomCoorX)
+						/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width) - (int) ((-1 * (double) leftBottomCoorX)
+								/ ((double) rightTopCoorX - (double) leftBottomCoorX) * width);
+				
+				My = Math.max(Math.abs((x2 - x)/(delta)), Math.abs((x3 - x2)/(delta)));
+				Mx = Math.max(Math.abs((y2 - y)/(delta)), Math.abs((y3 - y2)/(delta)));
 				dt = Math.min(((rightTopCoorX - leftBottomCoorX) 
 						/ (1 * Mx * ( width ))),
 						(rightTopCoorY - leftBottomCoorY)
 								/ (1 * My * (height )));
 				t += dt;
 				delta = dt;
-				log("k = " + k);
-			} while (xx >= 1);
-			log("i = " + i);
+			} while (xx >= 1 && t < tEnd);
 		}
-		
+		public double getX(double t){
+			double a = Math.tan(Math.PI + t);
+			double tmp = Math.sqrt(Math.tan(Math.PI + t));
+			double x = paramC * Math.sqrt(2) * ((tmp + tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp));
+			return x;
+		}
+		public double getY(double t){
+			double tmp = Math.sqrt(Math.tan(Math.PI + t));
+			double y = paramC * Math.sqrt(2) * ((tmp - tmp * tmp * tmp)/(1 + tmp * tmp * tmp * tmp));
+			return y;
+			
+		}
+		public double getTFromX(double x){
+			double y = -Math.sqrt(Math.sqrt(Math.pow(paramC, 4) + 4 * x * x * paramC * paramC) - x * x - paramC * paramC);
+			double t = Math.acos((x * x + y * y) / (2 * paramC * paramC )) / 2;
+			return t;
+		}
 	}
 	
 	public static void log(String str){

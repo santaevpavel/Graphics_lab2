@@ -56,7 +56,7 @@ public class Main {
 			text2.setEditable(false);
 			text2.setPreferredSize(new Dimension(100, 30));
 			sliderMove = new JSlider(10, 100, 50);
-			sliderZoom = new JSlider(1, 50, 10);
+			sliderZoom = new JSlider(1, 20, 10);
 			
 			sliderMove.setToolTipText("sdf");
 			sliderMove.setPaintLabels(true);
@@ -111,7 +111,7 @@ public class Main {
 		}
 	}
 
-	public static final String MAIN_FRAME_TITLE = "Lab #1";
+	public static final String MAIN_FRAME_TITLE = "Lab #2";
 	private static final MainFrame mainFrame = new MainFrame(MAIN_FRAME_TITLE);
 	private static Action settings;
 
