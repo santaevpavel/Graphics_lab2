@@ -59,7 +59,9 @@ public class MainFrame extends JFrame {
 	private static String subMenuEXitTitle = "Exit";
 	private static String menuHelpTitle = "Help";
 	private static String subMenuAbouTitle = "About";
-
+	
+	private static String aboutString = "Лемниска́та Берну́лли — плоская алгебраическая кривая. \nОпределяется как геометрическое место точек,\n произведение расстояний от которых до двух заданных точек (фокусов)\n постоянно и равно квадрату половины \nрасстояния между фокусами.";
+	
 	private JToolBar toolBar = null;
 	private JPanel drawPanel = null;
 
@@ -167,14 +169,16 @@ public class MainFrame extends JFrame {
 				int panelX = drawPanel.getLocationOnScreen().x;
 				int panelY = drawPanel.getLocationOnScreen().y;
 				log("x y = " + (y - panelY));
-				if (panelX < x
-						&& panelX + drawPanel.getWidth() > x
-						&& panelY < y
-						&& panelY + drawPanel.getHeight() > y) {
+				if (panelX < x && panelX + drawPanel.getWidth() > x
+						&& panelY < y && panelY + drawPanel.getHeight() > y) {
 					if (r > 0) {
-						zoom(1 - ZOOM_STEP, new MyPoint(x - panelX, drawPanel.getHeight() - (y - panelY), Color.BLACK));
+						zoom(1 - ZOOM_STEP,
+								new MyPoint(x - panelX, drawPanel.getHeight()
+										- (y - panelY), Color.BLACK));
 					} else {
-						zoom(1 + ZOOM_STEP, new MyPoint(x - panelX, drawPanel.getHeight() - (y - panelY), Color.BLACK));
+						zoom(1 + ZOOM_STEP,
+								new MyPoint(x - panelX, drawPanel.getHeight()
+										- (y - panelY), Color.BLACK));
 					}
 				} else {
 					if (r > 0) {
@@ -235,7 +239,10 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				JOptionPane.showMessageDialog(MainFrame.this, "About");
+				JOptionPane
+						.showMessageDialog(
+								MainFrame.this,
+								aboutString);
 			}
 		});
 		menuBar.add(helpMenu);
@@ -272,7 +279,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(MainFrame.this, "About");
+				JOptionPane.showMessageDialog(MainFrame.this, aboutString);
 			}
 		};
 		Action actionExit = new AbstractAction("Exit", iconExit) {
